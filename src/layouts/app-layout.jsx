@@ -1,3 +1,4 @@
+// /
 import Header from "@/components/header";
 import { Outlet } from "react-router-dom";
 
@@ -9,11 +10,16 @@ const AppLayout = () => {
         <Header />
         <Outlet />
       </main>
-      <div className="p-10 text-center bg-gray-800 mt-10">
-        Made By Haseeb Parth and Ayush
+      <div className="p-10 text-center bg-black mt-10">
+        {" "}
+        Made by{" "}
+        <span className="text-red-500 text-xl">
+          Parth Dwivedi and Haseeb Ali.{" "}
+        </span>
+        <br /> &copy; 2021 Hirred Inc. All rights reserved.
       </div>
     </div>
   );
 };
 
-export default AppLayout;
+export default AppLayout;

@@ -2,7 +2,6 @@ import { getCompanies } from "@/api/apiCompanies";
 import { addNewJob } from "@/api/apiJobs";
 import AddCompanyDrawer from "@/components/add-company-drawer";
 import { Button } from "@/components/ui/button";
-
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -53,21 +52,9 @@ const PostJob = () => {
     fn: fnCreateJob,
   } = useFetch(addNewJob);
 
-  const onSubmit = (data) => {
-    fnCreateJob({
-      ...data,
-      recruiter_id: user.id,
-      isOpen: true,
-    });
-  };
-
-  useEffect(() => {
-    if (dataCreateJob?.length > 0) navigate("/jobs");
-  }, [loadingCreateJob]);
-
   const {
     loading: loadingCompanies,
-    data: companies,
+    data: companies = [],
     fn: fnCompanies,
   } = useFetch(getCompanies);
 
@@ -78,6 +65,10 @@ const PostJob = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded]);
 
+  useEffect(() => {
+    if (dataCreateJob?.length > 0) navigate("/jobs");
+  }, [dataCreateJob, navigate]);
+
   if (!isLoaded || loadingCompanies) {
     return <BarLoader className="mb-4" width={"100%"} color="#36d7b7" />;
   }
@@ -85,6 +76,14 @@ const PostJob = () => {
   if (user?.unsafeMetadata?.role !== "recruiter") {
     return <Navigate to="/jobs" />;
   }
+
+  const onSubmit = (data) => {
+    fnCreateJob({
+      ...data,
+      recruiter_id: user.id,
+      isOpen: true,
+    });
+  };
 
   return (
     <div>
@@ -132,15 +131,15 @@ const PostJob = () => {
                 <SelectTrigger>
                   <SelectValue placeholder="Company">
                     {field.value
-                      ? companies?.find((com) => com.id === Number(field.value))
-                          ?.name
+                      ? companies.find((com) => com.id === Number(field.value))
+                          ?.name || "Company"
                       : "Company"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {companies?.map(({ name, id }) => (
-                      <SelectItem key={name} value={id}>
+                    {companies.map(({ name, id }) => (
+                      <SelectItem key={id} value={id.toString()}>
                         {name}
                       </SelectItem>
                     ))}
@@ -168,11 +167,8 @@ const PostJob = () => {
         {errors.requirements && (
           <p className="text-red-500">{errors.requirements.message}</p>
         )}
-        {errors.errorCreateJob && (
-          <p className="text-red-500">{errors?.errorCreateJob?.message}</p>
-        )}
         {errorCreateJob?.message && (
-          <p className="text-red-500">{errorCreateJob?.message}</p>
+          <p className="text-red-500">{errorCreateJob.message}</p>
         )}
         {loadingCreateJob && <BarLoader width={"100%"} color="#36d7b7" />}
         <Button type="submit" variant="blue" size="lg" className="mt-2">

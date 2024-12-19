@@ -1,3 +1,4 @@
+// 
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -8,7 +9,7 @@ import {
   useUser,
 } from "@clerk/clerk-react";
 import { Button } from "./ui/button";
-import { BriefcaseBusiness, Heart, PenBox, Home } from "lucide-react";
+import { BriefcaseBusiness, Heart, PenBox } from "lucide-react";
 
 const Header = () => {
   const [showSignIn, setShowSignIn] = useState(false);
@@ -19,6 +20,7 @@ const Header = () => {
     if (search.get("sign-in")) {
       setShowSignIn(true);
     }
+    return () => setShowSignIn(false); // Cleanup on unmount or route change
   }, [search]);
 
   const handleOverlayClick = (e) => {
@@ -32,7 +34,7 @@ const Header = () => {
     <>
       <nav className="py-4 flex justify-between items-center">
         <Link to="/">
-          <img src="/logo.png" className="h-20" alt="Hirrd Logo" />
+          <img src="/logo.png" className="h-20" alt="Hirred Logo" />
         </Link>
 
         <div className="flex gap-8">
@@ -41,15 +43,9 @@ const Header = () => {
               Login
             </Button>
           </SignedOut>
-          <SignedIn>
-            <Link to="/">
-              <Button variant="outline" className="flex items-center">
-                <Home size={20} className="mr-2" />
-                Home
-              </Button>
-            </Link>
 
-            
+          <SignedIn>
+            {/* Recruiter-Specific Button */}
             {user?.unsafeMetadata?.role === "recruiter" && (
               <Link to="/post-job">
                 <Button variant="destructive" className="rounded-full">
@@ -59,6 +55,20 @@ const Header = () => {
               </Link>
             )}
 
+            {/* Candidate-Specific Button */}
+            {user?.unsafeMetadata?.role === "candidate" && (
+              <a
+                href="https://ai-interviewer-pd.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="destructive" className="rounded-full">
+                  Prepare for an Interview
+                </Button>
+              </a>
+            )}
+
+            {/* User Dropdown Menu */}
             <UserButton
               appearance={{
                 elements: {
@@ -84,6 +94,7 @@ const Header = () => {
         </div>
       </nav>
 
+      {/* Sign-In Modal */}
       {showSignIn && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
@@ -99,4 +110,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default Header;
